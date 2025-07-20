@@ -1,0 +1,125 @@
+package service
+
+import (
+	"aristools/internal/dto"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"time"
+)
+
+const (
+	fileName = "./Todo.txt"
+)
+
+var TodoSrv = &TodoService{}
+
+type TodoService struct{}
+
+// 新增任务
+func (s *TodoService) Add(req dto.AddTodoDto) error {
+
+	todos, err := read()
+	if err != nil {
+		return err
+	}
+
+	for i := range todos {
+		if todos[i].Name == req.Name {
+			return errors.New("已存在同名任务")
+		}
+	}
+
+	todos = append(todos, dto.TodoDto{
+		Id:   getNewId(todos),
+		Name: req.Name,
+		DoAt: req.DoAt,
+	})
+	return write(todos)
+}
+
+func (s *TodoService) Done(id int64) error {
+	todos, err := read()
+	if err != nil {
+		return err
+	}
+	for i, item := range todos {
+		if item.Id == id {
+			todos[i].DoneAt = time.Now().Format("2006-01-02")
+			write(todos)
+			return nil
+		}
+	}
+	return fmt.Errorf("未找到该任务,Id:%d", id)
+}
+
+// 列表
+func (s *TodoService) List(today bool, all bool) ([]dto.TodoDto, error) {
+
+	todos, err := read()
+	if err != nil {
+		return nil, err
+	}
+	if today {
+		todays := make([]dto.TodoDto, 0)
+		for _, item := range todos {
+			if item.DoAt == time.Now().Format("2006-01-02") {
+				todays = append(todays, item)
+			}
+		}
+		return todays, nil
+	}
+	if all {
+		return todos, nil
+	}
+	unDones := make([]dto.TodoDto, 0)
+	for _, item := range todos {
+		if len(item.DoneAt) == 0 {
+			unDones = append(unDones, item)
+		}
+	}
+	return unDones, nil
+}
+
+// 加载todos
+func read() ([]dto.TodoDto, error) {
+
+	todos := []dto.TodoDto{}
+
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonDecoder := json.NewDecoder(f)
+	if err := jsonDecoder.Decode(&todos); err != nil {
+		if err != io.EOF {
+			return nil, err
+		}
+	}
+
+	return todos, nil
+}
+
+// 持久化todos
+func write(todos []dto.TodoDto) error {
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	jsonCoder := json.NewEncoder(f)
+	if err := jsonCoder.Encode(&todos); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 获取新的Id
+func getNewId(todos []dto.TodoDto) int64 {
+	if len(todos) == 0 {
+		return 1
+	}
+	return todos[len(todos)-1].Id + 1
+}
