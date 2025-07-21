@@ -21,14 +21,14 @@ var listCmd = &cobra.Command{
 			fmt.Printf("err: %v\n", err)
 		}
 		// 打印表头，增加竖线和横线
-		fmt.Printf(" %-3s   %-26s %-3s\n", "ID", "Name", "today")
+		fmt.Printf(" %-3s  %-10s %-26s \n", "ID", "today", "Name")
 
 		// 打印数据行，增加竖线
 		for _, d := range todos {
 			if len(d.DoneAt) == 0 {
-				fmt.Printf(" %-3d    %-26s   %-3t\n", d.Id, d.Name, d.DoAt == time.Now().Format("2006-01-02"))
+				fmt.Printf(" %-3d  %-10t  %-26s\n", d.Id, d.DoAt == time.Now().Format("2006-01-02"), d.Name)
 			} else {
-				fmt.Printf(strikethrough(" %-3d    %-26s   %-3t\n"), d.Id, d.Name, d.DoAt == time.Now().Format("2006-01-02"))
+				fmt.Printf(strikethrough(" %-3d  %-10t  %-26s\n"), d.Id, d.DoAt == time.Now().Format("2006-01-02"), d.Name)
 			}
 
 		}
