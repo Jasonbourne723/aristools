@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"aristools/cmd/todo"
+	"aristools/cmd/word"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	rootCmd.AddCommand(todo.TodoCmd)
+	rootCmd.AddCommand(word.WordCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("err: %v\n", err)

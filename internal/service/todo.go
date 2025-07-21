@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-const (
-	fileName = "./Todo.txt"
-)
-
 var TodoSrv = &TodoService{}
 
 type TodoService struct{}
@@ -21,7 +17,7 @@ type TodoService struct{}
 // 新增任务
 func (s *TodoService) Add(req dto.AddTodoDto) error {
 
-	todos, err := read()
+	todos, err := s.read()
 	if err != nil {
 		return err
 	}
@@ -33,22 +29,22 @@ func (s *TodoService) Add(req dto.AddTodoDto) error {
 	}
 
 	todos = append(todos, dto.TodoDto{
-		Id:   getNewId(todos),
+		Id:   s.getNewId(todos),
 		Name: req.Name,
 		DoAt: req.DoAt,
 	})
-	return write(todos)
+	return s.write(todos)
 }
 
 func (s *TodoService) Done(id int64) error {
-	todos, err := read()
+	todos, err := s.read()
 	if err != nil {
 		return err
 	}
 	for i, item := range todos {
 		if item.Id == id {
 			todos[i].DoneAt = time.Now().Format("2006-01-02")
-			write(todos)
+			s.write(todos)
 			return nil
 		}
 	}
@@ -58,7 +54,7 @@ func (s *TodoService) Done(id int64) error {
 // 列表
 func (s *TodoService) List(today bool, all bool) ([]dto.TodoDto, error) {
 
-	todos, err := read()
+	todos, err := s.read()
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +80,15 @@ func (s *TodoService) List(today bool, all bool) ([]dto.TodoDto, error) {
 }
 
 // 加载todos
-func read() ([]dto.TodoDto, error) {
+func (s *TodoService) read() ([]dto.TodoDto, error) {
 
 	todos := []dto.TodoDto{}
 
-	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	f, err := os.OpenFile(todoFileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	jsonDecoder := json.NewDecoder(f)
 	if err := jsonDecoder.Decode(&todos); err != nil {
@@ -104,11 +101,12 @@ func read() ([]dto.TodoDto, error) {
 }
 
 // 持久化todos
-func write(todos []dto.TodoDto) error {
-	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+func (s *TodoService) write(todos []dto.TodoDto) error {
+	f, err := os.OpenFile(todoFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	jsonCoder := json.NewEncoder(f)
 	if err := jsonCoder.Encode(&todos); err != nil {
 		return err
@@ -117,7 +115,7 @@ func write(todos []dto.TodoDto) error {
 }
 
 // 获取新的Id
-func getNewId(todos []dto.TodoDto) int64 {
+func (s *TodoService) getNewId(todos []dto.TodoDto) int64 {
 	if len(todos) == 0 {
 		return 1
 	}

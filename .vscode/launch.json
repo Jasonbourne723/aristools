@@ -16,6 +16,15 @@
         "mode": "auto",
         "program": "${workspaceFolder}/main.go",
         "args": ["todo", "add", "-n=test","-d=ceshi","-t"]
+      },
+       {
+        "name": "Debug aris word add",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/main.go",
+        "args": ["word", "test"],
+        "console": "integratedTerminal"
       }
     ]
   }
