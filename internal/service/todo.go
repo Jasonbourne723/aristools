@@ -36,6 +36,54 @@ func (s *TodoService) Add(req dto.AddTodoDto) error {
 	return s.write(todos)
 }
 
+func (s *TodoService) Del(ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	todos, err := s.read()
+	if err != nil {
+		return err
+	}
+	var newTodos []dto.TodoDto
+	for _, item := range todos {
+		isDeleted := false
+		for _, id := range ids {
+			if item.Id == id {
+				isDeleted = true
+			}
+		}
+		if !isDeleted {
+			newTodos = append(newTodos, item)
+		}
+	}
+	return s.write(newTodos)
+}
+
+func (s *TodoService) Today(ids []int64) error {
+
+	if len(ids) == 0 {
+		return nil
+	}
+
+	todos, err := s.read()
+	if err != nil {
+		return err
+	}
+	hasChanged := false
+	for i, item := range todos {
+		for _, id := range ids {
+			if item.Id == id {
+				todos[i].DoAt = time.Now().Format("2006-01-02")
+				hasChanged = true
+			}
+		}
+	}
+	if hasChanged {
+		s.write(todos)
+	}
+	return nil
+}
+
 func (s *TodoService) Done(id int64) error {
 	todos, err := s.read()
 	if err != nil {

@@ -19,4 +19,6 @@ func init() {
 	TodoCmd.AddCommand(addCmd)
 	TodoCmd.AddCommand(listCmd)
 	TodoCmd.AddCommand(doneCmd)
+	TodoCmd.AddCommand(todayCmd)
+	TodoCmd.AddCommand(delCmd)
 }
