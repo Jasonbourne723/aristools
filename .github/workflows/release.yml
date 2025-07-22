@@ -32,11 +32,12 @@ jobs:
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/aris-${{ matrix.goos }}-${{ matrix.goarch }}$EXT main.go
 
       - name: Upload to GitHub Release
+        if: matrix.goos == 'linux' && matrix.goarch == 'amd64'  # ✅ 只允许一个 Job 执行上传
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           files: dist/*
-          overwrite: true        # 如果 release 存在就覆盖
-          prerelease: false      # 可选：控制是否为预发布
+          overwrite: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
