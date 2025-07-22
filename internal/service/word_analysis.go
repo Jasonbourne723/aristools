@@ -64,7 +64,12 @@ func (s *wordAnalysisService) GetAll() ([]*dto.WordAnalysisByDayDto, error) {
 }
 
 func (s *wordAnalysisService) read() ([]*dto.WordAnalysisByDayDto, error) {
-	f, err := os.OpenFile(wordAnalysisFileName, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
+	filePath, err := getFilePath(wordAnalysisFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +84,11 @@ func (s *wordAnalysisService) read() ([]*dto.WordAnalysisByDayDto, error) {
 }
 
 func (s *wordAnalysisService) write(words []*dto.WordAnalysisByDayDto) error {
-	f, err := os.OpenFile(wordAnalysisFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	filePath, err := getFilePath(wordAnalysisFileName)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}

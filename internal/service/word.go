@@ -92,7 +92,11 @@ func (s *wordService) Import(filePath string) (int, error) {
 }
 
 func (s wordService) read() ([]dto.WordDto, error) {
-	f, err := os.OpenFile(wordFileName, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
+	filePath, err := getFilePath(wordFileName)
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +111,11 @@ func (s wordService) read() ([]dto.WordDto, error) {
 }
 
 func (s *wordService) write(words []dto.WordDto) error {
-	f, err := os.OpenFile(wordFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	filePath, err := getFilePath(wordFileName)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}

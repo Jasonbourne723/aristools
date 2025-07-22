@@ -59,7 +59,11 @@ func (s *errorWordService) mapToDictionary(words []*dto.ErrorWordDto) map[int64]
 }
 
 func (s *errorWordService) read() ([]*dto.ErrorWordDto, error) {
-	f, err := os.OpenFile(errorWordFileName, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
+	filePath, err := getFilePath(errorWordFileName)
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +78,11 @@ func (s *errorWordService) read() ([]*dto.ErrorWordDto, error) {
 }
 
 func (s *errorWordService) write(words []*dto.ErrorWordDto) error {
-	f, err := os.OpenFile(errorWordFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	filePath, err := getFilePath(errorWordFileName)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}

@@ -131,8 +131,11 @@ func (s *TodoService) List(today bool, all bool) ([]dto.TodoDto, error) {
 func (s *TodoService) read() ([]dto.TodoDto, error) {
 
 	todos := []dto.TodoDto{}
-
-	f, err := os.OpenFile(todoFileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	filePath, err := getFilePath(todoFileName)
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +153,13 @@ func (s *TodoService) read() ([]dto.TodoDto, error) {
 
 // 持久化todos
 func (s *TodoService) write(todos []dto.TodoDto) error {
-	f, err := os.OpenFile(todoFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+
+	filePath, err := getFilePath(todoFileName)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}
