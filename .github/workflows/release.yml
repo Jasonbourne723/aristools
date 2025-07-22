@@ -34,6 +34,9 @@ jobs:
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
           files: dist/*
+          overwrite: true        # 如果 release 存在就覆盖
+          prerelease: false      # 可选：控制是否为预发布
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
