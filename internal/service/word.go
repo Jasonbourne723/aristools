@@ -27,23 +27,52 @@ func (s *wordService) Add(req dto.AddWordDto) error {
 	}
 
 	words = append(words, dto.WordDto{
-		En: req.En,
-		Cn: req.Cn,
-		Id: s.getNewId(words),
+		En:    req.En,
+		Cn:    req.Cn,
+		Id:    s.getNewId(words),
+		Times: 0,
 	})
 	return s.write(words)
 }
 
 // 统计数量
-func (s *wordService) Count() (int64, error) {
+func (s *wordService) Count() (int64, map[int]int, error) {
 	words, err := s.read()
 	if err != nil {
-		return 0, err
+		return 0, nil, err
 	}
-	return int64(len(words)), nil
+	m := make(map[int]int)
+	for _, word := range words {
+		if _, exist := m[word.Times]; exist {
+			m[word.Times]++
+		} else {
+			m[word.Times] = 1
+		}
+	}
+	return int64(len(words)), m, nil
 }
 
-func (s *wordService) Rand(count int) ([]dto.WordDto, error) {
+// 更新正确次数
+func (s *wordService) UpdateTimes(words []*dto.WordDto) error {
+	dtos, err := s.read()
+	if err != nil {
+		return err
+	}
+	m := make(map[string]*dto.WordDto)
+	for _, item := range words {
+		m[item.En] = item
+	}
+
+	for i, item := range dtos {
+		if word, exist := m[item.En]; exist {
+			dtos[i].Times += word.Times
+		}
+	}
+	return s.write(dtos)
+}
+
+// 随机单词
+func (s *wordService) Rand(count int, limitTimes int) ([]*dto.WordDto, error) {
 	words, err := s.read()
 	if err != nil {
 		return nil, err
@@ -54,9 +83,19 @@ func (s *wordService) Rand(count int) ([]dto.WordDto, error) {
 	if count > len(words) {
 		count = len(words)
 	}
-	return words[:count], nil
+	randWords := []*dto.WordDto{}
+	for _, word := range words {
+		if len(randWords) >= count {
+			break
+		}
+		if word.Times < limitTimes {
+			randWords = append(randWords, &word)
+		}
+	}
+	return randWords, nil
 }
 
+// csv导入单词
 func (s *wordService) Import(filePath string) (int, error) {
 
 	words, err := s.read()

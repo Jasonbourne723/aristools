@@ -11,18 +11,18 @@ var countCmd = &cobra.Command{
 	Use:   "count",
 	Short: "统计单词数量",
 	Run: func(cmd *cobra.Command, args []string) {
-		count, err := service.WordSrv.Count()
+		count, m, err := service.WordSrv.Count()
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 		} else {
 			fmt.Printf("总单词量: %v\n", count)
 		}
-		errorCount, err := service.ErrorWordSrv.Count()
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
-		} else {
-			fmt.Printf("错词本单词数量: %v\n", errorCount)
+		fmt.Println("----------------------------------")
+		fmt.Printf("%-10s %-10s\n", "正确次数", "数量")
+		for key, value := range m {
+			fmt.Printf("%-10d %-10d\n", key, value)
 		}
+
 	},
 }
 

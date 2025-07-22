@@ -6,7 +6,8 @@ type AddWordDto struct {
 }
 
 type WordDto struct {
-	Id int64    `json:"id"`
-	En string   `json:"en"`
-	Cn []string `json:"cn"`
+	Id    int64    `json:"id"`
+	En    string   `json:"en"`
+	Cn    []string `json:"cn"`
+	Times int      `json:"times"`
 }

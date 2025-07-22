@@ -12,21 +12,22 @@ import (
 )
 
 var (
-	count int
-	mode  string
+	count      int
+	limitTimes int
+	mode       string
 )
 
 var testCommand = &cobra.Command{
 	Use:   "test",
 	Short: "测试单词",
 	Run: func(cmd *cobra.Command, args []string) {
-		words, err := service.WordSrv.Rand(count)
+		words, err := service.WordSrv.Rand(count, limitTimes)
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 		}
 		total := len(words)
-		errorWords := []*dto.ErrorWordDto{}
-		for _, item := range words {
+		errCount := 0
+		for i, item := range words {
 
 			var isTrue bool
 			for i := 0; i < 2; i++ {
@@ -41,23 +42,17 @@ var testCommand = &cobra.Command{
 			}
 			if !isTrue {
 				fmt.Printf("The correct answer is %s %s\n", item.En, strings.Join(item.Cn, ","))
-				errorWords = append(errorWords, &dto.ErrorWordDto{
-					Id:    item.Id,
-					En:    item.En,
-					Cn:    item.Cn,
-					Times: 1,
-				})
-			}
-		}
-		fmt.Printf("total:%d,wrong:%d\n", total, len(errorWords))
-		if len(errorWords) > 0 {
-			if err := service.ErrorWordSrv.Add(errorWords); err != nil {
-				fmt.Printf("错词本记录: %v\n", err)
+				words[i].Times = -1
+				errCount++
 			} else {
-				fmt.Printf("加入错词本%d个单词\n", len(errorWords))
+				words[i].Times = 1
 			}
 		}
-		if err := service.WordAnalysisSrv.Set(total, len(errorWords)); err != nil {
+		fmt.Printf("total:%d,wrong:%d\n", total, errCount)
+		if err := service.WordSrv.UpdateTimes(words); err != nil {
+			fmt.Printf("err: %v\n", err)
+		}
+		if err := service.WordAnalysisSrv.Set(total, errCount); err != nil {
 			fmt.Printf("err: %v\n", err)
 			return
 		} else {
@@ -73,11 +68,12 @@ var testCommand = &cobra.Command{
 
 func init() {
 	testCommand.Flags().IntVarP(&count, "count", "c", 10, "数量")
+	testCommand.Flags().IntVarP(&limitTimes, "limit", "l", 5, "正确次数小于几次的单词")
 	testCommand.Flags().StringVarP(&mode, "mode", "m", "e", "模式,e:看中写英,c:看英写中")
 	WordCmd.AddCommand(testCommand)
 }
 
-func testEn(word dto.WordDto) bool {
+func testEn(word *dto.WordDto) bool {
 	fmt.Printf("%s\n", strings.Join(word.Cn, ","))
 	reader := bufio.NewReader(os.Stdin)
 	content, _ := reader.ReadString('\n')
@@ -85,7 +81,7 @@ func testEn(word dto.WordDto) bool {
 	return content == word.En
 }
 
-func testCn(word dto.WordDto) bool {
+func testCn(word *dto.WordDto) bool {
 	fmt.Printf("%s\n", word.En)
 	reader := bufio.NewReader(os.Stdin)
 	content, _ := reader.ReadString('\n')

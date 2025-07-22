@@ -26,6 +26,7 @@ go.work.sum
 
 # env file
 .env
+/aris_data/*
 
 # Editor/IDE
 # .idea/
