@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	DataDir              = "aris_data"
 	todoFileName         = "todo.txt"
 	wordFileName         = "word.txt"
 	errorWordFileName    = "wordError.txt"
@@ -18,6 +19,6 @@ func getFilePath(fileName string) (string, error) {
 		return "", err
 	}
 	dir := filepath.Dir(exePath)
-	p := filepath.Join(dir, "aris_data", fileName)
+	p := filepath.Join(dir, DataDir, fileName)
 	return p, nil
 }

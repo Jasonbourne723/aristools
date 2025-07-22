@@ -20,6 +20,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(todo.TodoCmd)
 	rootCmd.AddCommand(word.WordCmd)
+	rootCmd.AddCommand(syncCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("err: %v\n", err)
