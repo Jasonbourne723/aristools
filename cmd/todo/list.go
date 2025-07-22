@@ -3,7 +3,6 @@ package todo
 import (
 	"aristools/internal/service"
 	"fmt"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -31,16 +30,15 @@ func showList(today bool, all bool) {
 		fmt.Printf("err: %v\n", err)
 	}
 	// 打印表头，增加竖线和横线
-	fmt.Printf(" %-3s  %-10s %-26s \n", "ID", "today", "Name")
+	fmt.Printf(" %-3s %-26s \n", "ID", "Name")
 
 	// 打印数据行，增加竖线
 	for _, d := range todos {
-		if len(d.DoneAt) == 0 {
-			fmt.Printf(" %-3d  %-10t  %-26s\n", d.Id, d.DoAt == time.Now().Format("2006-01-02"), d.Name)
-		} else {
-			fmt.Printf(strikethrough(" %-3d  %-10t  %-26s\n"), d.Id, d.DoAt == time.Now().Format("2006-01-02"), d.Name)
+		var format = " %-3d   %-26s\n"
+		if len(d.DoneAt) != 0 {
+			format = strikethrough(format)
 		}
-
+		fmt.Printf(format, d.Id, d.Name)
 	}
 }
 
