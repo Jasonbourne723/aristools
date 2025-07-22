@@ -17,7 +17,7 @@ var countCmd = &cobra.Command{
 		} else {
 			fmt.Printf("总单词量: %v\n", count)
 		}
-		fmt.Println("----------------------------------")
+		fmt.Println("-------------------------------")
 		fmt.Printf("%-10s %-10s\n", "正确次数", "数量")
 		for key, value := range m {
 			fmt.Printf("%-10d %-10d\n", key, value)
