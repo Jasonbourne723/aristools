@@ -3,7 +3,10 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'  # 仅在推送版本标签时触发，如 v0.1.0
+      - 'v*.*.*'
+
+permissions:
+  contents: write  # 关键：允许创建 Release
 
 jobs:
   build:
@@ -14,24 +17,21 @@ jobs:
         goarch: [amd64]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
-      - name: Build binary
+      - name: Build
         run: |
           mkdir -p dist
           EXT=""
-          if [ "${{ matrix.goos }}" = "windows" ]; then
-            EXT=".exe"
-          fi
+          if [ "${{ matrix.goos }}" = "windows" ]; then EXT=".exe"; fi
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/aris-${{ matrix.goos }}-${{ matrix.goarch }}$EXT main.go
 
-      - name: Upload release assets
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
