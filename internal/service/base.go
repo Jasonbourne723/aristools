@@ -20,6 +20,7 @@ func getDir() (string, error) {
 		return "", err
 	}
 	dir := filepath.Dir(exePath)
+	dir = filepath.Join(dir, DataDir)
 	if err := ensureDir(dir); err != nil {
 		return "", err
 	}
@@ -33,7 +34,7 @@ func getFilePath(fileName string) (string, error) {
 		return "", err
 	}
 
-	p := filepath.Join(dir, DataDir, fileName)
+	p := filepath.Join(dir, fileName)
 	return p, nil
 }
 
