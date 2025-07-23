@@ -43,11 +43,7 @@ func (s *wordService) Count() (int64, map[int]int, error) {
 	}
 	m := make(map[int]int)
 	for _, word := range words {
-		if _, exist := m[word.Times]; exist {
-			m[word.Times]++
-		} else {
-			m[word.Times] = 1
-		}
+		m[word.Times] += 1
 	}
 	return int64(len(words)), m, nil
 }
