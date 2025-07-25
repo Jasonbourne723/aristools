@@ -4,7 +4,6 @@ import (
 	"aristools/internal/dto"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -84,19 +83,20 @@ func (s *TodoService) Today(ids []int64) error {
 	return nil
 }
 
-func (s *TodoService) Done(id int64) error {
+func (s *TodoService) Done(ids []int64) error {
 	todos, err := s.read()
 	if err != nil {
 		return err
 	}
 	for i, item := range todos {
-		if item.Id == id {
-			todos[i].DoneAt = time.Now().Format("2006-01-02")
-			s.write(todos)
-			return nil
+		for _, id := range ids {
+			if item.Id == id {
+				todos[i].DoneAt = time.Now().Format("2006-01-02")
+				s.write(todos)
+			}
 		}
 	}
-	return fmt.Errorf("未找到该任务,Id:%d", id)
+	return nil
 }
 
 // 列表
