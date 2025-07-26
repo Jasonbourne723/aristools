@@ -92,10 +92,10 @@ func (s *TodoService) Done(ids []int64) error {
 		for _, id := range ids {
 			if item.Id == id {
 				todos[i].DoneAt = time.Now().Format("2006-01-02")
-				s.write(todos)
 			}
 		}
 	}
+	s.write(todos)
 	return nil
 }
 

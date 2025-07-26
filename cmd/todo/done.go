@@ -16,6 +16,8 @@ var doneCmd = &cobra.Command{
 		ids := make([]int64, 0, len(args))
 		for _, arg := range args {
 			if id, err := strconv.Atoi(arg); err != nil {
+				fmt.Printf("err: %v\n", err)
+			} else {
 				ids = append(ids, int64(id))
 			}
 		}
