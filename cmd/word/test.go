@@ -26,7 +26,7 @@ var testCommand = &cobra.Command{
 			fmt.Printf("err: %v\n", err)
 		}
 		total := len(words)
-		errCount := 0
+		var errWords []*dto.WordDto
 		for i, item := range words {
 
 			var isTrue bool
@@ -37,22 +37,41 @@ var testCommand = &cobra.Command{
 					isTrue = testCn(item)
 				}
 				if isTrue {
+					fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
 					break
 				}
 			}
 			if !isTrue {
-				fmt.Printf("The correct answer is %s %s\n", item.En, strings.Join(item.Cn, ","))
+				fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
 				words[i].Times = -1
-				errCount++
+				errWords = append(errWords, item)
 			} else {
 				words[i].Times = 1
 			}
 		}
-		fmt.Printf("total:%d,wrong:%d\n", total, errCount)
+		for _, item := range errWords {
+			var isTrue bool
+			for i := 0; i < 2; i++ {
+				if mode == "e" {
+					isTrue = testEn(item)
+				} else {
+					isTrue = testCn(item)
+				}
+				if isTrue {
+					fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+					break
+				}
+			}
+			if !isTrue {
+				fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+			}
+		}
+
+		fmt.Printf("total:%d,wrong:%d\n", total, len(errWords))
 		if err := service.WordSrv.UpdateTimes(words); err != nil {
 			fmt.Printf("err: %v\n", err)
 		}
-		if err := service.WordAnalysisSrv.Set(total, errCount); err != nil {
+		if err := service.WordAnalysisSrv.Set(total, len(errWords)); err != nil {
 			fmt.Printf("err: %v\n", err)
 			return
 		} else {
