@@ -68,6 +68,9 @@ var testCommand = &cobra.Command{
 		}
 
 		fmt.Printf("total:%d,wrong:%d\n", total, len(errWords))
+		for _, errWord := range errWords {
+			fmt.Print(errWord.En, "\t")
+		}
 		if err := service.WordSrv.UpdateTimes(words); err != nil {
 			fmt.Printf("err: %v\n", err)
 		}
@@ -111,4 +114,18 @@ func testCn(word *dto.WordDto) bool {
 		}
 	}
 	return false
+}
+
+func print(word *dto.WordDto, isRight bool) {
+	println("*********************************************")
+	if isRight {
+		fmt.Println("****************  you are right  *****************")
+	} else {
+		fmt.Println("****************  you are wrong  *****************")
+	}
+	println("*********************************************")
+	fmt.Printf("%s   %s\n", word.En, word.SoundMark)
+	fmt.Printf("%s\n", strings.Join(word.Cn, ","))
+	fmt.Printf("example: %s\n", word.Example)
+	println("*********************************************")
 }

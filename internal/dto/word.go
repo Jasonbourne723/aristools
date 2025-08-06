@@ -11,4 +11,5 @@ type WordDto struct {
 	Cn        []string `json:"cn"`
 	SoundMark string   `json:"soundmark"`
 	Times     int      `json:"times"`
+	Example   string   `json:"example"`
 }

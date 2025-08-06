@@ -84,7 +84,7 @@ func (s *wordService) Rand(count int, limitTimes int) ([]*dto.WordDto, error) {
 		if len(randWords) >= count {
 			break
 		}
-		if word.Times < limitTimes {
+		if word.Times == limitTimes {
 			randWords = append(randWords, &word)
 		}
 	}
