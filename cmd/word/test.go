@@ -37,12 +37,12 @@ var testCommand = &cobra.Command{
 					isTrue = testCn(item)
 				}
 				if isTrue {
-					fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+					print(item, true)
 					break
 				}
 			}
 			if !isTrue {
-				fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+				println(item, false)
 				words[i].Times = -1
 				errWords = append(errWords, item)
 			} else {
@@ -58,12 +58,12 @@ var testCommand = &cobra.Command{
 					isTrue = testCn(item)
 				}
 				if isTrue {
-					fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+					print(item, true)
 					break
 				}
 			}
 			if !isTrue {
-				fmt.Printf("En: %s , SoundMark: %s , Cn: %s\n", item.En, item.SoundMark, strings.Join(item.Cn, ","))
+				print(item, false)
 			}
 		}
 
