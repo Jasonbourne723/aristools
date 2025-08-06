@@ -5,6 +5,7 @@ import (
 	"aristools/internal/service"
 	"bufio"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"strings"
 
@@ -117,15 +118,107 @@ func testCn(word *dto.WordDto) bool {
 }
 
 func print(word *dto.WordDto, isRight bool) {
-	println("*********************************************")
+	// 定义颜色
+	green := color.New(color.FgGreen, color.Bold)
+	red := color.New(color.FgRed, color.Bold)
+	cyan := color.New(color.FgCyan)
+	yellow := color.New(color.FgYellow)
+	white := color.New(color.FgWhite)
+
+	// 分隔线
+	separator := "═══════════════════════════════════════════"
+
+	// 打印顶部边框
+	white.Println(separator)
+
+	// 打印结果信息
 	if isRight {
-		fmt.Println("****************  you are right  *****************")
+		green.Printf("║%^44s║\n", "✔  YOU ARE RIGHT ✔")
 	} else {
-		fmt.Println("****************  you are wrong  *****************")
+		red.Printf("║%^44s║\n", "✘  YOU ARE WRONG ✘")
 	}
-	println("*********************************************")
-	fmt.Printf("%s   %s\n", word.En, word.SoundMark)
-	fmt.Printf("%s\n", strings.Join(word.Cn, ","))
-	fmt.Printf("example: %s\n", word.Example)
-	println("*********************************************")
+
+	// 打印中间分隔线
+	white.Println(separator)
+
+	// 打印单词信息
+	cyan.Printf("║ %-20s %-21s ║\n", "Word:", word.En)
+	yellow.Printf("║ %-20s %-21s ║\n", "Pronunciation:", word.SoundMark)
+
+	// 处理中文释义换行
+	cnLines := splitChineseDefinitions(word.Cn, 38)
+	for i, line := range cnLines {
+		prefix := "║ "
+		if i == 0 {
+			prefix = "║ Meaning:       "
+		} else {
+			prefix = "║                "
+		}
+		white.Printf("%s%-30s║\n", prefix, line)
+	}
+
+	// 打印例句
+	exampleLines := splitExample(word.Example, 38)
+	for i, line := range exampleLines {
+		prefix := "║ "
+		if i == 0 {
+			prefix = "║ Example:       "
+		} else {
+			prefix = "║                "
+		}
+		white.Printf("%s%-30s║\n", prefix, line)
+	}
+
+	// 打印底部边框
+	white.Println(separator)
+}
+
+// 分割中文释义以适应宽度
+func splitChineseDefinitions(definitions []string, maxWidth int) []string {
+	var result []string
+	currentLine := ""
+
+	for _, def := range definitions {
+		if len(currentLine)+len(def)+2 > maxWidth && currentLine != "" {
+			result = append(result, currentLine)
+			currentLine = def
+		} else {
+			if currentLine != "" {
+				currentLine += ", "
+			}
+			currentLine += def
+		}
+	}
+
+	if currentLine != "" {
+		result = append(result, currentLine)
+	}
+
+	return result
+}
+
+// 分割例句以适应宽度
+func splitExample(example string, maxWidth int) []string {
+	var result []string
+
+	words := strings.Fields(example)
+	currentLine := ""
+
+	for _, word := range words {
+		if len(currentLine)+len(word)+1 > maxWidth {
+			result = append(result, currentLine)
+			currentLine = word
+		} else {
+			if currentLine != "" {
+				currentLine += " "
+			}
+			currentLine += word
+		}
+	}
+
+	if currentLine != "" {
+		result = append(result, currentLine)
+	}
+
+	return result
 }
