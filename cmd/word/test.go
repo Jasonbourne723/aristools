@@ -43,7 +43,7 @@ var testCommand = &cobra.Command{
 				}
 			}
 			if !isTrue {
-				println(item, false)
+				print(item, false)
 				words[i].Times = -1
 				errWords = append(errWords, item)
 			} else {
@@ -133,9 +133,9 @@ func print(word *dto.WordDto, isRight bool) {
 
 	// 打印结果信息
 	if isRight {
-		green.Printf("║%^44s║\n", "✔  YOU ARE RIGHT ✔")
+		green.Printf("║%-44s║\n", "✔  YOU ARE RIGHT ✔")
 	} else {
-		red.Printf("║%^44s║\n", "✘  YOU ARE WRONG ✘")
+		red.Printf("║%-44s║\n", "✘  YOU ARE WRONG ✘")
 	}
 
 	// 打印中间分隔线
@@ -166,7 +166,7 @@ func print(word *dto.WordDto, isRight bool) {
 		} else {
 			prefix = "║                "
 		}
-		white.Printf("%s%-30s║\n", prefix, line)
+		white.Printf("%s%-50s║\n", prefix, line)
 	}
 
 	// 打印底部边框
