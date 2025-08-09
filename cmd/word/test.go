@@ -97,7 +97,7 @@ func init() {
 }
 
 func testEn(word *dto.WordDto) bool {
-	fmt.Printf("%s\n", strings.Join(word.Cn, ","))
+	fmt.Printf("%s %s \n", strings.Join(word.Cn, ","), word.SoundMark)
 	reader := bufio.NewReader(os.Stdin)
 	content, _ := reader.ReadString('\n')
 	content = strings.TrimSpace(content)
